@@ -134,9 +134,11 @@ func (sl *Slice) Append(header *types.Header, domTerminus common.Hash, td *big.I
 	domTerminus, newTermini, err := sl.pcrc(batch, block.Header(), domTerminus)
 	if err != nil {
 		if errors.Is(err, ErrSubNotSyncedToDom) && domOrigin {
+			// retry
 			sl.procfutureHeaders()
-		} else {
+		} else if !domOrigin {
 			sl.addfutureHeader(block.Header())
+			return sl.nilPendingHeader, err
 		}
 		return sl.nilPendingHeader, err
 	}
