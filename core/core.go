@@ -68,6 +68,12 @@ func (c *Core) InsertChainWithoutSealVerification(block *types.Block) (int, erro
 	return 0, nil
 }
 
+func (c *Core) ReadyToAppend(slice common.Location) error {
+	// check if the block that I am trying to append if the block from
+	// the sub location which is ready to append
+	return nil
+}
+
 func (c *Core) Processor() *StateProcessor {
 	return c.sl.hc.bc.processor
 }

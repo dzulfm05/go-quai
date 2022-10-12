@@ -80,6 +80,7 @@ type Backend interface {
 	SubRelayPendingHeader(pendingHeader types.PendingHeader, reorg bool) error
 	GetPendingHeader() (*types.Header, error)
 	PendingBlockAndReceipts() (*types.Block, types.Receipts)
+	ReadyToAppend(slice common.Location) error
 
 	// Transaction pool API
 	SendTx(ctx context.Context, signedTx *types.Transaction) error

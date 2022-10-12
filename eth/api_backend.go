@@ -389,3 +389,7 @@ func (b *QuaiAPIBackend) SubscribeHeaderRootsEvent(ch chan<- types.HeaderRoots) 
 func (b *QuaiAPIBackend) SubscribePendingHeaderEvent(ch chan<- *types.Header) event.Subscription {
 	return b.eth.core.SubscribePendingHeader(ch)
 }
+
+func (b *QuaiAPIBackend) ReadyToAppend(slice common.Location) error {
+	return b.eth.core.ReadyToAppend(slice)
+}

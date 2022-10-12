@@ -173,3 +173,11 @@ func (ec *Client) SubRelayPendingHeader(ctx context.Context, pendingHeader types
 	}
 	return nil
 }
+
+func (ec *Client) ReadyToAppend(ctx context.Context, slice common.Location) error {
+	err := ec.c.CallContext(ctx, nil, "quai_readyToAppend", slice)
+	if err != nil {
+		return err
+	}
+	return nil
+}
