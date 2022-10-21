@@ -122,7 +122,9 @@ func (sl *Slice) Append(header *types.Header, domTerminus common.Hash, td *big.I
 	block := sl.ConstructLocalBlock(header)
 	if block == nil {
 		// add the block to the future header cache
-		sl.addfutureHeader(header)
+		if !domOrigin {
+			sl.addfutureHeader(header)
+		}
 		return sl.nilPendingHeader, errors.New("could not find the tx and uncle data to match the header root hash")
 	}
 
@@ -581,7 +583,10 @@ func (sl *Slice) procfutureHeaders() {
 
 		for i := range headers {
 			var nilHash common.Hash
-			sl.Append(headers[i], nilHash, big.NewInt(0), false, false)
+			_, err := sl.Append(headers[i], nilHash, big.NewInt(0), false, false)
+			if err != nil {
+				break
+			}
 		}
 	}
 }

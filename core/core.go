@@ -39,24 +39,31 @@ func NewCore(db ethdb.Database, config *Config, isLocalBlock func(block *types.H
 func (c *Core) InsertChain(blocks types.Blocks) (int, error) {
 	domWait := false
 	for i, block := range blocks {
-		isCoincident := c.sl.engine.HasCoincidentDifficulty(block.Header())
-		// Write the block body to the db.
-		rawdb.WritePendingBlockBody(c.sl.sliceDb, block.Header().Root(), block.Body())
+		// Don't append the block which already exists in the database.
+		header := rawdb.ReadHeader(c.sl.sliceDb, block.Hash(), block.NumberU64())
+		if header == nil {
+			isCoincident := c.sl.engine.HasCoincidentDifficulty(block.Header())
+			// Write the block body to the db.
+			rawdb.WritePendingBlockBody(c.sl.sliceDb, block.Header().Root(), block.Body())
 
-		// if the order of the block is less than the context
-		// add the rest of the blocks in the queue to the future blocks.
-		if !isCoincident && !domWait {
-			_, err := c.sl.Append(block.Header(), common.Hash{}, big.NewInt(0), false, true)
-			if err != nil {
-				if err == consensus.ErrFutureBlock {
-					c.sl.addfutureHeader(block.Header())
+			// if the order of the block is less than the context
+			// add the rest of the blocks in the queue to the future blocks.
+			if !isCoincident && !domWait {
+				_, err := c.sl.Append(block.Header(), common.Hash{}, big.NewInt(0), false, true)
+				if err != nil {
+					if err == consensus.ErrFutureBlock {
+						c.sl.addfutureHeader(block.Header())
+					}
+					if err.Error() == "sub not synced to dom" {
+						return i, nil
+					}
+					log.Info("InsertChain", "err in Append core: ", err)
+					return i, err
 				}
-				log.Info("InsertChain", "err in Append core: ", err)
-				return i, err
+			} else {
+				domWait = true
+				c.sl.addfutureHeader(block.Header())
 			}
-		} else {
-			domWait = true
-			c.sl.addfutureHeader(block.Header())
 		}
 	}
 	return len(blocks), nil

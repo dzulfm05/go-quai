@@ -215,7 +215,7 @@ func (h *handler) runEthPeer(peer *eth.Peer, handler eth.Handler) error {
 
 	// If we have any explicit whitelist block hashes, request them
 	for number := range h.whitelist {
-		if err := peer.RequestHeadersByNumber(number, 1, 0, false); err != nil {
+		if err := peer.RequestHeadersByNumber(number, 1, false, false); err != nil {
 			return err
 		}
 	}

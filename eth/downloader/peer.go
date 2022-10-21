@@ -70,8 +70,8 @@ type peerConnection struct {
 // LightPeer encapsulates the methods required to synchronise with a remote light peer.
 type LightPeer interface {
 	Head() (common.Hash, uint64)
-	RequestHeadersByHash(common.Hash, int, int, bool) error
-	RequestHeadersByNumber(uint64, int, int, bool) error
+	RequestHeadersByHash(common.Hash, int, bool, bool) error
+	RequestHeadersByNumber(uint64, int, bool, bool) error
 }
 
 // Peer encapsulates the methods required to synchronise with a remote full peer.
@@ -114,7 +114,7 @@ func (p *peerConnection) FetchHeaders(from uint64, count int) error {
 	p.headerStarted = time.Now()
 
 	// Issue the header retrieval request (absolute upwards without gaps)
-	go p.peer.RequestHeadersByNumber(from, count, 0, false)
+	go p.peer.RequestHeadersByNumber(from, count, false, true)
 
 	return nil
 }
