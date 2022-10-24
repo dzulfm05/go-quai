@@ -83,10 +83,11 @@ func answerGetBlockHeadersQuery(backend Backend, query *GetBlockHeadersPacket, p
 		}
 
 		// For syncing the tail
-		if first && query.Dom && !hashMode {
-			first = false
-			headers = append(headers, origin)
-		}
+		// if first && query.Dom && !hashMode {
+		// 	first = false
+		// 	headers = append(headers, origin)
+		// }
+
 		// If dom is true only append header to results array if it is a dominant header
 		if query.Dom {
 			if backend.Core().Engine().HasCoincidentDifficulty(origin) {
